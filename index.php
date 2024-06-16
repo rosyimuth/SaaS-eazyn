@@ -1,12 +1,21 @@
+<?php
+session_start();
+
+//proses pengecekan session
+if(!isset($_SESSION['id'])){
+  header('Location: login.php');
+}
+?>
+
 <?php 
 //1. koneksi ke MySQL
 require_once("config/connect.php");
 //2. Membuat query sesuai kebutuhan
 $query = "select izin.*, guru.nama as nama_guru, bk.nama as nama_bk 
           from izin
-          inner join guru on guru.id=izin.guru_id
-          inner join bk on bk.id=izin.bk_id
-          where siswa_id = 2";
+          inner join guru on guru.id = izin.guru_id
+          left join bk on bk.id = izin.bk_id
+          where siswa_id = " .$_SESSION['id'];
           //tips: jalankan query di phpmyadmin untuk uji coba sql
 //3. Menjalankan query
 $run_sql = mysqli_query($is_connect, $query);
@@ -109,7 +118,7 @@ $run_sql = mysqli_query($is_connect, $query);
                       <i class="ti ti-mail fs-6"></i>
                       <p class="mb-0 fs-3">My Account</p>
                     </a>
-                    <a href="./authentication-login.html" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
+                    <a href="logout.php" class="btn btn-outline-primary mx-3 mt-2 d-block">Logout</a>
                   </div>
                 </div>
               </li>
@@ -152,8 +161,8 @@ $run_sql = mysqli_query($is_connect, $query);
                     <tbody>
                       <?php
                       //4. Menampilkan menggunakan mysqli_fetch_all
-                      $fetch_data = mysqli_fetch_all($run_sql, MYSQLI_BOTH);
-                        foreach($fetch_data as $data){
+                      $fetch_data = mysqli_fetch_all($run_sql, MYSQLI_BOTH); //mengambil data dari variabel, lalu menyimpannya pada array fetch_data
+                        foreach($fetch_data as $data){ //mengulang elemen fetch_data
                       ?>
                       <tr>
                         <td class="border-bottom-0"><h6 class="fw-semibold mb-0"><?php echo $data[0]?></h6></td>
@@ -181,7 +190,7 @@ $run_sql = mysqli_query($is_connect, $query);
                             <?php
                             }elseif($data["is_approved"] == 3){
                             ?>
-                            <span class="badge bg-warning rounded-3 fw-semibold">Ditolak</span>
+                            <span class="badge bg-danger rounded-3 fw-semibold">Ditolak</span>
                             <?php
                             }
                             ?>
